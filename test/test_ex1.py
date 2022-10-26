@@ -4,7 +4,7 @@ from datetime import datetime
 from ex1 import Ticket, LateTicket, AdvanceTicket, StudentTicket
 
 
-class MyTestCase(unittest.TestCase):
+class TestEx1(unittest.TestCase):
     def test_constructor_validation(self):
         with self.assertRaises(TypeError):
             Ticket('not a number')
