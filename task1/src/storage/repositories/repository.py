@@ -1,13 +1,13 @@
+import tempfile
 from abc import ABC
-from os.path import abspath
 from pathlib import Path
-from sys import path
 
+from task1.src.singleton import Singleton
 from task1.src.storage.metadata import Metadata
 
 
-class Repository(ABC):
-    __storage_folder = Path(path[0]).joinpath('storage')
+class Repository(ABC, Singleton):
+    __storage_folder = Path(tempfile.gettempdir()).joinpath('storage')
 
     def __init__(self, entity_name: str):
         self._path = self.__storage_folder.joinpath(entity_name)

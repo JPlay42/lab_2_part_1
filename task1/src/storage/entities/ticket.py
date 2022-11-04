@@ -8,13 +8,19 @@ from task1.src.storage.entities.event import Event
 
 @dataclass(frozen=True)
 class Ticket(ABC):
-    event: Event | None
+    id: int | None
+    event: Event
     name: str
     date: datetime
     is_student: bool
 
     def __post_init__(self):
-        if not isinstance(self.event, (Event, NoneType)):
+        if not isinstance(self.id, (int, NoneType)):
+            raise TypeError('id is not int')
+        if self.id is not None and self.id <= 0:
+            raise ValueError('id is not positive')
+
+        if not isinstance(self.event, Event):
             raise TypeError('event is not Event')
 
         if not isinstance(self.name, str):
@@ -31,13 +37,13 @@ class Ticket(ABC):
             raise TypeError('is_student is not bool')
 
     @staticmethod
-    def of(event: Event, name: str, date: datetime, is_student: bool):
+    def of(ticket_id: int | None, event: Event, name: str, date: datetime, is_student: bool):
         days_to_event = (event.date - date).days
         if days_to_event >= 60:
-            return AdvanceTicket(event, name, date, is_student)
+            return AdvanceTicket(ticket_id, event, name, date, is_student)
         if days_to_event < 10:
-            return LateTicket(event, name, date, is_student)
-        return RegularTicket(event, name, date, is_student)
+            return LateTicket(ticket_id, event, name, date, is_student)
+        return RegularTicket(ticket_id, event, name, date, is_student)
 
     @abstractmethod
     def price(self):
