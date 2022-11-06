@@ -7,6 +7,7 @@ class Metadata(JsonFile):
     def __init__(self, folder: Path):
         super().__init__(folder, 'metadata')
         self.write('entries_count', 0)
+        self.write('special_ids', list())
 
     def new_entry_id(self):
         return self.increment_and_get('entries_count')

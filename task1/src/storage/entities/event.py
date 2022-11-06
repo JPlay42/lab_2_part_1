@@ -23,6 +23,8 @@ class Event:
 
         if not isinstance(self.date, datetime):
             raise TypeError('date is not datetime')
+        if self.date <= datetime.now():
+            raise ValueError('date is not in the future')
 
         if not isinstance(self.price, int):
             raise TypeError('price is not int')

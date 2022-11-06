@@ -23,17 +23,17 @@ class EventsRepositoryTest(unittest.TestCase):
     def test_create(self):
         repo = EventsRepository()
 
-        now = datetime.now()
-        before = now - timedelta(days=5)
-        self.assertEqual(1, repo.create(Event(None, 'first', before, 100)))
-        self.assertEqual(2, repo.create(Event(None, 'second', now, 200)))
+        time1 = datetime.now() + timedelta(days=5)
+        time2 = time1 + timedelta(days=5)
+        self.assertEqual(1, repo.create(Event(None, 'first', time1, 100)))
+        self.assertEqual(2, repo.create(Event(None, 'second', time2, 200)))
 
         first_path = self.__events_dir.joinpath('1.json')
         self.assertTrue(first_path.exists())
         with open(first_path, 'r') as file:
             content = json.load(file)
             self.assertEqual('first', content['name'])
-            self.assertEqual(before.isoformat(), content['date'])
+            self.assertEqual(time1.isoformat(), content['date'])
             self.assertEqual(100, content['price'])
 
         second_path = self.__events_dir.joinpath('2.json')
@@ -41,13 +41,13 @@ class EventsRepositoryTest(unittest.TestCase):
         with open(second_path, 'r') as file:
             content = json.load(file)
             self.assertEqual('second', content['name'])
-            self.assertEqual(now.isoformat(), content['date'])
+            self.assertEqual(time2.isoformat(), content['date'])
             self.assertEqual(200, content['price'])
 
     def test_read(self):
         repo = EventsRepository()
 
-        created_event = Event(None, 'Event name', datetime.now(), 128)
+        created_event = Event(None, 'Event name', datetime.now() + timedelta(days=5), 128)
         event_id = repo.create(created_event)
 
         received_event = repo.read(event_id)
@@ -59,11 +59,11 @@ class EventsRepositoryTest(unittest.TestCase):
     def test_read_all(self):
         repo = EventsRepository()
 
-        now = datetime.now()
-        before = now - timedelta(days=5)
+        time1 = datetime.now() + timedelta(days=5)
+        time2 = time1 + timedelta(days=5)
 
-        first_event = Event(None, 'first', before, 100)
-        second_event = Event(None, 'second', now, 200)
+        first_event = Event(None, 'first', time1, 100)
+        second_event = Event(None, 'second', time2, 200)
         repo.create(first_event)
         repo.create(second_event)
         received_events = repo.read_all()
@@ -75,13 +75,13 @@ class EventsRepositoryTest(unittest.TestCase):
     def test_update(self):
         repo = EventsRepository()
 
-        now = datetime.now()
-        tomorrow = now + timedelta(days=1)
+        time1 = datetime.now() + timedelta(days=1)
+        time2 = time1 + timedelta(days=1)
 
-        event = Event(None, 'Event name', now, 123)
+        event = Event(None, 'Event name', time1, 123)
         event_id = repo.create(event)
 
-        updated_event = Event(event_id, event.name, tomorrow, event.price)
+        updated_event = Event(event_id, event.name, time2, event.price)
         repo.update(updated_event)
         received_updated_event = repo.read(event_id)
         self.assertEqual(updated_event, received_updated_event)
@@ -89,7 +89,7 @@ class EventsRepositoryTest(unittest.TestCase):
     def test_delete(self):
         repo = EventsRepository()
 
-        event = Event(None, 'Event name', datetime.now(), 123)
+        event = Event(None, 'Event name', datetime.now() + timedelta(days=5), 123)
         event_id = repo.create(event)
         events = repo.read_all()
         self.assertEqual(1, len(events))

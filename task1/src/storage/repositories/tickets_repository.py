@@ -33,17 +33,11 @@ class TicketsRepository(Repository):
     def read_all(self):
         entries = dict()
         events = self.__events_repository.read_all()
-        for filename in listdir(self._path):
-            json_name = splitext(filename)[0]
-            if json_name != 'metadata':
-                try:
-                    ticket_id = int(json_name)
-                    json_file = JsonFile(self._path, filename)
-                    content = json_file.read_all()
-                    event = events[content['event_id']]
-                    entries[ticket_id] = self.__dict_to_ticket(ticket_id, content,  event)
-                except ValueError:
-                    raise ValueError(f'Incorrect file {filename} in events storage')
+        for ticket_id in super()._get_existing_ids():
+            json_file = JsonFile(self._path, f'{ticket_id}.json')
+            content = json_file.read_all()
+            event = events[content['event_id']]
+            entries[ticket_id] = self.__dict_to_ticket(ticket_id, content,  event)
 
         return entries
 
