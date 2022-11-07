@@ -10,7 +10,7 @@ T = TypeVar('T')
 
 
 class Repository(ABC, Singleton, Generic[T]):
-    __storage_folder = Path(tempfile.gettempdir()).joinpath('storage')
+    __storage_folder = Path(tempfile.gettempdir()).joinpath('tickets_storage')
 
     @abstractmethod
     def create(self, entry: T):

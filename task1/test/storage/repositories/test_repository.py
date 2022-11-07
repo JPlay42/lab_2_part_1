@@ -5,7 +5,7 @@ from shutil import rmtree
 
 
 class RepositoryTest(unittest.TestCase):
-    storage = Path(tempfile.gettempdir()).joinpath(Path('storage'))
+    storage = Path(tempfile.gettempdir()).joinpath(Path('tickets_storage'))
 
     @staticmethod
     def __remove_storage():

@@ -27,8 +27,6 @@ class EventTest(unittest.TestCase):
             Event(1, '', future, 300)
         with self.assertRaises(TypeError):
             Event(1, 'name', 'not datetime', 300)
-        with self.assertRaises(ValueError):
-            Event(1, 'name', datetime.now(), 300)
         with self.assertRaises(TypeError):
             Event(1, 'name', future, 'not int')
         with self.assertRaises(ValueError):

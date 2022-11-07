@@ -25,6 +25,8 @@ class TicketsRepository(Repository[Ticket]):
         return ticket_id
 
     def read(self, ticket_id: int):
+        if ticket_id not in self.get_existing_ids():
+            return None
         json_file = JsonFile(self._path, str(ticket_id))
         content = json_file.read_all()
         event = self.__events_repository.read(content['event_id'])
