@@ -40,17 +40,6 @@ class JsonFileTest(unittest.TestCase):
         json_file = JsonFile(self.__temp_dir, 'test')
         self.assertEqual('value', json_file.read('name'))
 
-    def test_increment_and_get(self):
-        with open(self.__temp_file, 'w') as file:
-            json.dump({'count': 9}, file)
-
-        json_file = JsonFile(self.__temp_dir, 'test')
-        self.assertEqual(10, json_file.increment_and_get('count'))
-
-        with open(self.__temp_file, 'r') as file:
-            content = json.load(file)
-            self.assertEqual(10, content['count'])
-
     def test_write(self):
         json_file = JsonFile(self.__temp_dir, 'test')
         json_file.write('name', 'value')

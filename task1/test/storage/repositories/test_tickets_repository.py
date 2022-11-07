@@ -1,40 +1,44 @@
-import tempfile
 import unittest
 from datetime import datetime, timedelta
 from pathlib import Path
-from shutil import rmtree
 
 from task1.src.storage import TicketsRepository, EventsRepository
 from task1.src.storage.entities.event import Event
 from task1.src.storage.entities.ticket import Ticket
-from task1.src.storage.json_file import JsonFile
+from task1.test.storage.repositories.test_repository import RepositoryTest
 
 
-class TicketsRepositoryTest(unittest.TestCase):
-    __tickets_dir = Path(tempfile.gettempdir()).joinpath(Path('storage/tickets'))
-
-    def setUp(self):
-        storage = self.__tickets_dir.parent
-        if storage.exists():
-            rmtree(storage)
+class TicketsRepositoryTest(RepositoryTest):
+    __tickets_dir = RepositoryTest.storage.joinpath(Path('tickets'))
 
     def test_init(self):
         TicketsRepository()
         self.assertTrue(self.__tickets_dir.exists())
 
-    def test_create(self):
+    def test_create_with_auto_id(self):
         tickets_repo = TicketsRepository()
 
         event = self.default_event()
         ticket = Ticket.of(None, event, 'Ivan Kuruch', datetime.now(), True)
         ticket_id = tickets_repo.create(ticket)
+        expected_ticket = Ticket.of(
+            ticket_id,
+            ticket.event,
+            ticket.name,
+            ticket.date,
+            ticket.is_student
+        )
 
-        json_file = JsonFile(self.__tickets_dir, f'{ticket_id}.json')
-        content = json_file.read_all()
-        self.assertEqual(event.id, content['event_id'])
-        self.assertEqual(ticket.name, content['name'])
-        self.assertEqual(ticket.date.isoformat(), content['date'])
-        self.assertEqual(ticket.is_student, content['is_student'])
+        self.assertEqual(expected_ticket, tickets_repo.read_all()[ticket_id])
+
+    def test_create_with_manual_id(self):
+        tickets_repo = TicketsRepository()
+
+        event = self.default_event()
+        ticket = Ticket.of(1234, event, 'Ivan Kuruch', datetime.now(), True)
+        tickets_repo.create(ticket)
+
+        self.assertEqual(ticket, tickets_repo.read_all()[1234])
 
     def test_read(self):
         repo = TicketsRepository()

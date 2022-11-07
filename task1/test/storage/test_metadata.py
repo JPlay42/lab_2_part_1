@@ -1,4 +1,3 @@
-import json
 import tempfile
 import unittest
 from os import remove
@@ -20,14 +19,49 @@ class MetadataTest(unittest.TestCase):
         Metadata(self.__temp_dir)
         self.assertTrue(self.__temp_file.exists())
 
-    def test_new_entry_id(self):
+    def test_generate_id(self):
         metadata = Metadata(self.__temp_dir)
         for i in range(1, 6):
-            self.assertEqual(i, metadata.new_entry_id())
+            self.assertEqual(i, metadata.generate_id())
 
-        with open(self.__temp_file, 'r') as file:
-            content = json.load(file)
-            self.assertEqual(5, content['entries_count'])
+        self.assertEqual(5, len(metadata.get_existing_ids()))
+
+    def test_add_custom_id(self):
+        metadata = Metadata(self.__temp_dir)
+        for i in range(3):
+            metadata.generate_id()
+        for i in range(1, 4):
+            self.assertFalse(metadata.add_custom_id(i))
+
+        self.assertTrue(metadata.add_custom_id(4))
+        self.assertTrue(metadata.add_custom_id(10))
+        self.assertFalse(metadata.add_custom_id(10))
+        self.assertFalse(metadata.add_custom_id(4))
+
+        self.assertEqual(5, metadata.generate_id())
+
+    def test_get_all_ids(self):
+        metadata = Metadata(self.__temp_dir)
+
+        for i in range(3):
+            metadata.generate_id()
+        metadata.add_custom_id(5)
+
+        expected_ids = [1, 2, 3, 5]
+        self.assertEqual(expected_ids, metadata.get_existing_ids())
+
+    def test_delete_id(self):
+        metadata = Metadata(self.__temp_dir)
+
+        for i in range(3):
+            metadata.generate_id()
+        metadata.add_custom_id(5)
+        metadata.add_custom_id(8)
+        metadata.delete_id(2)
+        metadata.delete_id(5)
+
+        expected_ids = [1, 3, 8]
+        self.assertEqual(expected_ids, metadata.get_existing_ids())
 
 
 if __name__ == '__main__':
